@@ -72,6 +72,9 @@ static NSString* kLoremIpsum = @"Lorem ipsum dolor sit amet, consectetur adipisi
 
     @"Controls",
     [[[TTSwitchTableField alloc] initWithText:@"TTSwitchTableField"] autorelease],
+    [[[TTSliderTableField alloc] initWithText:@"TTSliderTableField" value:50.0
+									valueText:@"%0.1f %%" minimum:0.0 maximum:100.0 step:2.5] 
+	 autorelease],
     [[[TTTextFieldTableField alloc] initWithTitle:@"Title" text:@"TTTextFieldTableField"]
       autorelease],
     [[[TTTextViewTableField alloc] initWithText:@"TTTextViewTableField"] autorelease],

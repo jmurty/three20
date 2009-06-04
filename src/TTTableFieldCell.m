@@ -23,6 +23,7 @@ static CGFloat kKeySpacing = 12;
 static CGFloat kKeyWidth = 75;
 static CGFloat kMaxLabelHeight = 2000;
 static CGFloat kDisclosureIndicatorWidth = 23;
+static CGFloat kSliderHeight = 23;
 
 static CGFloat kTextFieldTitleWidth = 100;
 static CGFloat kTableViewFieldCellHeight = 180;
@@ -1141,6 +1142,128 @@ static CGFloat kDefaultIconSize = 50;
 - (void)valueChanged {
   TTSwitchTableField* field = self.object;
   field.on = _switch.on;
+}
+
+@end
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+@implementation TTSliderTableFieldCell
+
++ (CGFloat)tableView:(UITableView*)tableView rowHeightForItem:(id)item {
+	CGFloat maxWidth = tableView.width - kHPadding*2;
+	TTSliderTableField* field = item;
+	CGSize textSize = [field.text sizeWithFont:TTSTYLEVAR(tableSmallFont)
+					   constrainedToSize:CGSizeMake(maxWidth, CGFLOAT_MAX)
+					   lineBreakMode:UILineBreakModeWordWrap];
+	CGSize valueTextSize = [field.valueText sizeWithFont:TTSTYLEVAR(tableSmallFont)
+						    constrainedToSize:CGSizeMake(maxWidth, CGFLOAT_MAX) 
+							lineBreakMode:UILineBreakModeWordWrap];
+	
+	CGFloat maxLabelHeight = fmax(textSize.height, valueTextSize.height);
+	if (maxLabelHeight > kMaxLabelHeight) {
+		maxLabelHeight = kMaxLabelHeight;
+	}	
+	
+	return kVPadding*3 + maxLabelHeight + kSliderHeight;
+}
+
+- (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString*)identifier {
+	if (self = [super initWithFrame:frame reuseIdentifier:identifier]) {
+		_slider = [[UISlider alloc] initWithFrame:CGRectZero];
+		[_slider addTarget:self action:@selector(valueChanged)
+		  forControlEvents:UIControlEventValueChanged];
+		[self.contentView addSubview:_slider];
+
+		_valueLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+		[self.contentView addSubview:_valueLabel];
+		
+		self.accessoryType = UITableViewCellAccessoryNone;
+		self.selectionStyle = UITableViewCellSelectionStyleNone;
+	}
+	return self;
+}
+
+- (void)dealloc {
+	[_slider release];
+	[_valueLabel release];
+	[super dealloc];
+}
+
+// Private
+- (void)formatValueLabel {
+	TTSliderTableField* field = self.object;
+	if (field) {
+		_valueLabel.text = [NSString stringWithFormat:field.valueText, field.value];
+
+		// Re-layout value label, in case label size has changed with new text value.
+		[_valueLabel sizeToFit];
+		_valueLabel.top = kVPadding;
+		_valueLabel.right = self.contentView.width - kHPadding;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// UIView
+
+- (void)layoutSubviews {
+	[super layoutSubviews];
+
+	[_label sizeToFit];
+	_label.top = kVPadding;
+	
+	// Value label is right-anchored in cell
+	[_valueLabel sizeToFit];
+	_valueLabel.top = kVPadding;
+	_valueLabel.right = self.contentView.width - kHPadding;
+	
+	[_slider sizeToFit];
+	CGFloat maxLabelBottom = fmax(_label.bottom, _valueLabel.bottom);
+	_slider.frame = CGRectMake(kHPadding, maxLabelBottom + kVPadding, 
+							   self.contentView.width - kHPadding * 2, 
+							   kSliderHeight);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// TTTableViewCell
+
+- (void)setObject:(id)object {
+	if (_field != object) {
+		[super setObject:object];
+		
+		_label.font = TTSTYLEVAR(tableSmallFont);
+		_valueLabel.font = TTSTYLEVAR(tableSmallFont);
+		
+		TTSliderTableField* field = self.object;
+		_slider.minimumValue = field.minimum;
+		_slider.maximumValue = field.maximum;
+		_slider.value = field.value;
+		
+		[self formatValueLabel];
+	}  
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// UIControlEvents
+
+- (void)valueChanged {
+	TTSliderTableField* field = self.object;
+
+	// Quantize value to nearest step
+	float stepDistance = fmod(_slider.value, field.step);
+	float quantizedValue = _slider.value - stepDistance;
+	if (stepDistance > field.step / 2) {
+		// Round up quantized value to higher step
+		quantizedValue += field.step;
+	} 
+
+	// Ignore value "changes" that are less than a full step
+	if (fabs(quantizedValue - field.value) < field.step) {
+		return;
+	}
+	
+	field.value = quantizedValue;
+	[self formatValueLabel];
 }
 
 @end

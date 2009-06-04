@@ -384,3 +384,46 @@
 }
 
 @end
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+@implementation TTSliderTableField
+
+@synthesize value = _value, valueText = _valueText, 
+	minimum = _minimum, maximum = _maximum, step = _step;
+
+- (id)initWithText:(NSString*)text value:(float)value valueText:(NSString*)valueText
+		   minimum:(float)min maximum:(float)max step:(float)step 
+{
+	if (self = [self init]) {
+		_text = text;
+		_value = value;
+		_valueText = valueText;
+		_minimum = min;
+		_maximum = max;
+		_step = step;
+	}
+	return self;
+}
+
+- (id)initWithText:(NSString*)text value:(float)value valueText:(NSString*)valueText {
+	if (self = [self initWithText:text value:value valueText:valueText
+						  minimum:0.0 maximum:100.0 step:1.0]) 
+	{
+	}
+	return self;
+}
+
+- (id)init {
+	if (self = [super init]) {
+		_value = 50.0;
+		_valueText = @"%0.0f %%";
+		_minimum = 0.0;
+		_maximum = 100.0;
+		_step = 1.0;
+	}
+	return self;
+}
+
+
+@end
