@@ -167,3 +167,24 @@
 - (id)initWithText:(NSString*)text on:(BOOL)on;
 
 @end
+
+@interface TTSliderTableField : TTTableField {
+	float _value;	
+	NSString* _valueText;
+	float _minimum;
+	float _maximum;
+	float _step;
+}
+
+@property(nonatomic) float value;
+@property(nonatomic, copy) NSString* valueText;
+@property(nonatomic) float minimum;
+@property(nonatomic) float maximum;
+@property(nonatomic) float step;
+
+- (id)initWithText:(NSString*)text value:(float)value valueText:(NSString*)valueText
+		   minimum:(float)min maximum:(float)max step:(float)step;
+
+- (id)initWithText:(NSString*)text value:(float)value valueText:(NSString*)valueText;
+
+@end

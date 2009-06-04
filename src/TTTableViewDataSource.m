@@ -134,6 +134,8 @@
       return [TTTextViewTableFieldCell class];
     } else if ([object isKindOfClass:[TTSwitchTableField class]]) {
       return [TTSwitchTableFieldCell class];
+    } else if ([object isKindOfClass:[TTSliderTableField class]]) {
+		return [TTSliderTableFieldCell class];
     } else if ([object isKindOfClass:[TTStyledTextTableField class]]) {
       return [TTStyledTextTableFieldCell class];
     } else {

@@ -81,6 +81,13 @@
 
 @end
 
+@interface TTSliderTableFieldCell : TTTextTableFieldCell {
+	UILabel* _valueLabel;
+	UISlider* _slider;
+}
+
+@end
+
 @interface TTSearchBarTableFieldCell : TTTableViewCell {
   TTSearchBar* _searchBar;
 }
